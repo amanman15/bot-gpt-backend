@@ -1,6 +1,5 @@
 from groq import Groq
 from dotenv import load_dotenv
-import os
 from groq import GroqError
 
 
@@ -29,10 +28,12 @@ async def call_llm(messages_list):
         )
 
         return completion.choices[0].message.content
-
+    except TimeoutError:
+        return "LLM timed out. Please try again."
+    except ValueError as ve:
+        return f"LLM input error: {ve}"
     except GroqError as e:
         # LLM provider error
         raise RuntimeError(f"LLM call failed: {str(e)}")
-
     except Exception as e:
         raise RuntimeError(f"Unexpected LLM error: {str(e)}")

@@ -39,9 +39,8 @@ Email:<amanjainwork1599@gmail.com>
 - Persistent conversation history for each user  
 - Conversation titles (auto-generated from first user message)  
 - Supports multiple messages per conversation with proper sequence numbers  
-- Error handling for database & LLM calls (planned)  
+- Error handling for database & LLM calls
 
----
 **-----------------------------------------------------------------------------**
 ## Setup & Installation
 
@@ -59,6 +58,7 @@ pip install -r requirements.txt
 3. **Set environment variables**
 Create a .env file:
 GROQ_API_KEY=YOUR_GROQ_API_KEY
+
 4. **Run the application**
 uvicorn app.main:app --reload
 Visit http://127.0.0.1:8000/ for the health check
@@ -85,6 +85,7 @@ Response:
 }
 
 2. **Add Message to Existing Conversation**
+In this route we use sliding window, hardcoded as of now. This will set the context for the next message.
 POST /conversations/{conversation_id}/messages
 Request Body
 {

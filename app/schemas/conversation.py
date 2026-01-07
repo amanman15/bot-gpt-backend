@@ -11,6 +11,11 @@ class MessageItem(BaseModel):
     content: str
     sequence_number: int
 
+class ConversationListResponse(BaseModel):
+    conversation_id: int
+    title: str
+    created_at: datetime
+
 class ConversationResponse(BaseModel):
     conversation_id: int
     title: str

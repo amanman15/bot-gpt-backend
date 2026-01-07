@@ -7,7 +7,7 @@ from app.models.conversation import Conversation
 from app.models.message import Message
 from app.services.llm_service import call_llm
 from app.services.context_builder import build_context
-from app.schemas.conversation import StartConversationRequest, ConversationWithMessagesResponse, ConversationWithMessagesResponsePost, ConversationResponse, MessageRequest
+from app.schemas.conversation import StartConversationRequest, ConversationWithMessagesResponse, ConversationListResponse, ConversationWithMessagesResponsePost, ConversationResponse, MessageRequest
 
 router = APIRouter(prefix="/conversations", tags=["Conversations"])
 
@@ -62,7 +62,7 @@ async def start_conversation(payload: StartConversationRequest, db: Session = De
 
 
 # List all conversations for a user
-@router.get("/", response_model=List[ConversationResponse])
+@router.get("/", response_model=List[ConversationListResponse])
 def list_conversations(user_id: int, db: Session = Depends(get_db)):
     conversations = db.query(Conversation).filter(Conversation.user_id == user_id).all()
 
@@ -93,6 +93,7 @@ def list_conversations(user_id: int, db: Session = Depends(get_db)):
 
     return result
 # ------------------------------------------------------------------------------------------------
+
 #Get full conversation history by Conversation ID
 @router.get("/{conversation_id}", response_model=ConversationWithMessagesResponse)
 def get_conversation(conversation_id: int, db: Session = Depends(get_db)):
@@ -128,43 +129,50 @@ def get_conversation(conversation_id: int, db: Session = Depends(get_db)):
 # Add a new message to existing conversation
 @router.post("/{conversation_id}/messages", response_model=ConversationWithMessagesResponsePost)
 async def add_message(conversation_id: int, payload: MessageRequest, db: Session = Depends(get_db)):
-    # 1️⃣ Find conversation
+    # 1. Find conversation
     conversation = db.query(Conversation).filter(Conversation.id == conversation_id).first()
     if not conversation:
         raise HTTPException(status_code=404, detail="Conversation not found")
 
-    # 2️⃣ Determine next sequence number
+    # 2. Determine next sequence number
     last_message = db.query(Message).filter(Message.conversation_id == conversation_id).order_by(Message.sequence_number.desc()).first()
     next_seq = last_message.sequence_number + 1 if last_message else 1
 
-    # 3️⃣ Save user message
-    user_message = Message(
-        conversation_id=conversation_id,
-        role="user",
-        content=payload.message,
-        sequence_number=next_seq
-    )
-    db.add(user_message)
-    db.commit()
+    # 3. Save user message
+    try:
+        user_message = Message(
+            conversation_id=conversation_id,
+            role="user",
+            content=payload.message,
+            sequence_number=next_seq
+        )
+        db.add(user_message)
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise RuntimeError(f"Failed to save user message: {e}")
 
-    # 4️⃣ Build context for LLM (all previous messages + new user message)
+    # 4️. Build context for LLM (all previous messages + new user message)
     messages = db.query(Message).filter(Message.conversation_id == conversation_id).order_by(Message.sequence_number).all()
     context_text = "\n".join([m.content for m in messages])
     assistant_reply = await call_llm([context_text])
 
-    # 5️⃣ Save assistant reply
-    assistant_message = Message(
-        conversation_id=conversation_id,
-        role="assistant",
-        content=assistant_reply,
-        sequence_number=next_seq + 1
-    )
-    db.add(assistant_message)
-    db.commit()
+    # 5. Save assistant reply
+    try:
+        assistant_message = Message(
+            conversation_id=conversation_id,
+            role="assistant",
+            content=assistant_reply,
+            sequence_number=next_seq + 1
+        )
+        db.add(assistant_message)
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise RuntimeError(f"Failed to save assistant message: {e}")
 
-    # 6️⃣ Return full conversation history
+    # 6. Return full conversation history
     messages = db.query(Message).filter(Message.conversation_id == conversation_id).order_by(Message.sequence_number).all()
-    history = [{"role": m.role, "content": m.content} for m in messages]
 
     # return {
     #     "conversation_id": conversation_id,
@@ -183,8 +191,7 @@ async def add_message(conversation_id: int, payload: MessageRequest, db: Session
 }
 
 
-
-# 5️⃣ Delete a conversation and its messages
+# 5️. Delete a conversation and its messages
 @router.delete("/{conversation_id}")
 def delete_conversation(conversation_id: int, db: Session = Depends(get_db)):
     conversation = db.query(Conversation).filter(Conversation.id == conversation_id).first()
