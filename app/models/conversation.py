@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
-from datetime import datetime
+from datetime import datetime, timezone
 from app.db.database import Base
 
 class Conversation(Base):
@@ -9,8 +9,12 @@ class Conversation(Base):
     user_id = Column(Integer, ForeignKey("users.id"))
     title = Column(String, nullable=True)
     mode = Column(String, default="open")  # open | rag
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc)
+    )
     updated_at = Column(
-    DateTime,
-    default=datetime.utcnow,
-    onupdate=datetime.utcnow)
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc)
+    )

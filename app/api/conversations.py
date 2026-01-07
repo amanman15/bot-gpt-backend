@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 
-from app.db.database import SessionLocal
+from app.db.database import get_db
 from app.models.conversation import Conversation
 from app.models.message import Message
 from app.services.llm_service import call_llm
@@ -10,15 +10,6 @@ from app.services.context_builder import build_context
 from app.schemas.conversation import StartConversationRequest, ConversationWithMessagesResponse, ConversationListResponse, ConversationWithMessagesResponsePost, ConversationResponse, MessageRequest
 
 router = APIRouter(prefix="/conversations", tags=["Conversations"])
-
-# DB dependency
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
 
 #Start a new conversation with a user and first message
 @router.post("/", response_model=ConversationResponse)

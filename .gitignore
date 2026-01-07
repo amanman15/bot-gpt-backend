@@ -10,6 +10,7 @@ venv/
 
 # SQLite DB
 bot_gpt.db
+test.db
 
 # IDE
 .vscode/

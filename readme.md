@@ -178,6 +178,13 @@ created_at
 
 **------------------------------------------------------------------------------**
 
+**UNIT TESTING**
+Unit tests are written using pytest and FastAPI TestClient.
+A separate SQLite database is used for test isolation.
+Run tests using: pytest -v
+
+**------------------------------------------------------------------------------**
+
 **Usage Notes**
 
 Conversations retain full history for a continuous chat experience.

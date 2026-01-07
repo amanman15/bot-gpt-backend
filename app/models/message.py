@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text
-from datetime import datetime
+from datetime import datetime, timezone
 from app.db.database import Base
 
 class Message(Base):
@@ -10,4 +10,7 @@ class Message(Base):
     role = Column(String)  # user | assistant
     content = Column(Text)
     sequence_number = Column(Integer)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc)
+    )
