@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtual environment
+venv/
+
+# Env vars
+.env
+
+# SQLite DB
+bot_gpt.db
+
+# IDE
+.vscode/
+.idea/
+junk.py
