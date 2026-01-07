@@ -24,7 +24,7 @@ Email:<amanjainwork1599@gmail.com>
 - **Python 3.13**  
 - **FastAPI** – API framework  
 - **SQLAlchemy** – ORM for database interactions  
-- **SQLite** – Local database (can be replaced with PostgreSQL)  
+- **SQLite** – Local database (can be replaced with PostgreSQL for production grade.)  
 - **Groq SDK** – LLM integration (OpenAI GPT-OSS 120B model)  
 - **Pydantic** – Data validation and serialization  
 - **Dotenv** – Environment variable management  
@@ -35,11 +35,15 @@ Email:<amanjainwork1599@gmail.com>
 
 - Continuous turn-based chat with memory  
 - **Open Chat Mode:** General chat without context  
-- **RAG Mode:** Grounded chat using documents (planned)  
+- **RAG Mode:** Grounded chat using documents (planned not implemented yet)  
 - Persistent conversation history for each user  
 - Conversation titles (auto-generated from first user message)  
 - Supports multiple messages per conversation with proper sequence numbers  
 - Error handling for database & LLM calls
+- Listing all conversation as a tile view for a user.
+- Listing all the conversation in a particular conversation using its id.
+- Delete the entire conversation.
+- Add the message in the current conversation from the context.
 
 **-----------------------------------------------------------------------------**
 ## Setup & Installation
@@ -56,6 +60,7 @@ venv\Scripts\activate      # Windows
 pip install -r requirements.txt
 
 3. **Set environment variables**
+Go to: https://console.groq.com/playground?model=openai/gpt-oss-120b and create a free tier API Key
 Create a .env file:
 GROQ_API_KEY=YOUR_GROQ_API_KEY
 
@@ -63,7 +68,7 @@ GROQ_API_KEY=YOUR_GROQ_API_KEY
 uvicorn app.main:app --reload
 Visit http://127.0.0.1:8000/ for the health check
 
-Visit http://127.0.0.1:8000/docs/ for swagger.
+Visit http://127.0.0.1:8000/docs for swagger.
 
 **---------------------------------------------------------------------------------**
 ## API Endpoints
@@ -87,6 +92,7 @@ Response:
 2. **Add Message to Existing Conversation**
 In this route we use sliding window, hardcoded as of now. This will set the context for the next message.
 POST /conversations/{conversation_id}/messages
+conversation_id- as parameter
 Request Body
 {
   "message": "Tell me more about SpaceX."
@@ -95,6 +101,8 @@ Request Body
 Response:
 {
   "conversation_id": 1,
+  "title": "Tell me more about SpaceX",
+  "created_at": "2026-01-07T07:22:35.552194",
   "assistant_reply": "SpaceX is an aerospace manufacturer and space transport company...",
   "messages": [
     {"role": "user", "content": "Hello, who is Elon Musk?", "sequence_number": 1},
@@ -106,10 +114,10 @@ Response:
 
 3. **Get Conversation by ID**
 GET /conversations/{conversation_id}
+conversation_id-parameter
 Response
 {
   "conversation_id": 1,
-  "title": "Hello, who is Elon Musk?",
   "messages": [
     {"role": "user", "content": "Hello, who is Elon Musk?", "sequence_number": 1},
     {"role": "assistant", "content": "Elon Musk is the CEO of Tesla and SpaceX...", "sequence_number": 2},
@@ -120,6 +128,7 @@ Response
 
 4. **List All Conversations for a User**
 GET /conversations/?user_id={user_id}
+user_id-parameter
 Response
 [
   {
@@ -136,6 +145,7 @@ Response
 
 5. **Delete the conversation**
 DELETE /conversations/{conversation_id}
+conversation_id-paramter
 Response
 {
   "detail": "Conversation 1 deleted successfully"
@@ -164,6 +174,7 @@ conversation_id – Linked conversation
 role – "user" or "assistant"
 content – Text
 sequence_number – Order of message
+created_at
 
 **------------------------------------------------------------------------------**
 
