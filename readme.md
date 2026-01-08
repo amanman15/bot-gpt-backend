@@ -77,6 +77,7 @@ Visit http://127.0.0.1:8000/docs for swagger.
 ## API Endpoints
 
 1. **Start Conversation with a first message and mode**
+*Request URL: http://127.0.0.1:8000/conversations/*
 POST /conversations/
 Request Body
 {
@@ -94,6 +95,7 @@ Response:
 }
 
 2. **Add Message to Existing Conversation**
+*Request URL: http://127.0.0.1:8000/conversations/1/messages*
 In this route we use sliding window, hardcoded as of now. This will set the context for the next message.
 POST /conversations/{conversation_id}/messages
 conversation_id- as parameter
@@ -117,6 +119,7 @@ Response:
 }
 
 3. **Get Conversation by conversation ID**
+*Request URL: http://127.0.0.1:8000/conversations/1*
 GET /conversations/{conversation_id}
 conversation_id---->parameter
 Response
@@ -131,6 +134,7 @@ Response
 }
 
 4. **List All Conversations for a User(list view)**
+*Request URL: http://127.0.0.1:8000/conversations/?user_id=2*
 GET /conversations/?user_id={user_id}
 user_id-parameter
 Response
@@ -148,6 +152,7 @@ Response
 ]
 
 5. **Delete the conversation**
+*Request URL: http://127.0.0.1:8000/conversations/1*
 DELETE /conversations/{conversation_id}
 conversation_id---->paramter
 Response
