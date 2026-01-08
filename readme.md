@@ -159,11 +159,7 @@ Response
 
 **Database Models**
 
-1. **User**
-
-id
-
-2. **Conversation**
+1. **Conversation**
 
 id – Conversation ID
 user_id – Linked user
@@ -171,7 +167,7 @@ title – First message snippet
 mode – open or rag
 created_at, updated_at – timestamps
 
-3. **Message**
+2. **Message**
 
 id – Message ID
 conversation_id – Linked conversation
