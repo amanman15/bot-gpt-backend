@@ -1,3 +1,4 @@
+# unittest-1
 def test_start_conversation(client):
     response = client.post(
         "/conversations/",
@@ -7,15 +8,16 @@ def test_start_conversation(client):
     assert "conversation_id" in response.json()
 
 
+# unittest-2
 def test_get_conversation(client):
-    # First create conversation
+    # creating conversation
     response = client.post(
         "/conversations/",
         json={"user_id": 1, "message": "Hello"}
     )
     conversation_id = response.json()["conversation_id"]
 
-    # Then fetch conversation
+    # fetchng conversation
     response = client.get(f"/conversations/{conversation_id}")
     assert response.status_code == 200
     assert "messages" in response.json()

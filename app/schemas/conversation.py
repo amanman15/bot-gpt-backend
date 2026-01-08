@@ -1,10 +1,11 @@
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Optional, Literal
 from datetime import datetime
 
 class StartConversationRequest(BaseModel):
     user_id: int
     message: str
+    mode: Literal["open", "rag"] = "open"
 
 class MessageItem(BaseModel):
     role: str

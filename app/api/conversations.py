@@ -7,6 +7,7 @@ from app.models.conversation import Conversation
 from app.models.message import Message
 from app.services.llm_service import call_llm
 from app.services.context_builder import build_context
+from app.services.rag_service import get_mock_context
 from app.schemas.conversation import StartConversationRequest, ConversationWithMessagesResponse, ConversationListResponse, ConversationWithMessagesResponsePost, ConversationResponse, MessageRequest
 
 router = APIRouter(prefix="/conversations", tags=["Conversations"])
@@ -15,7 +16,7 @@ router = APIRouter(prefix="/conversations", tags=["Conversations"])
 @router.post("/", response_model=ConversationResponse)
 async def start_conversation(payload: StartConversationRequest, db: Session = Depends(get_db)):
     # Create conversation
-    conversation = Conversation(user_id=payload.user_id, title=payload.message[:50])
+    conversation = Conversation(user_id=payload.user_id, title=payload.message[:50], mode=payload.mode)
     db.add(conversation)
     db.commit()
     db.refresh(conversation)
@@ -29,9 +30,12 @@ async def start_conversation(payload: StartConversationRequest, db: Session = De
     )
     db.add(user_message)
     db.commit()
-
+    if conversation.mode == "rag":
+        retrieved_context = get_mock_context(conversation.id)
+    else:
+        retrieved_context = None
     # Call LLM
-    context = build_context([], payload.message)
+    context = build_context([], payload.message, retrieved_context)
     assistant_reply = await call_llm(context)
 
     # Save assistant reply

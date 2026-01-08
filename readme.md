@@ -35,7 +35,7 @@ Email:<amanjainwork1599@gmail.com>
 
 - Continuous turn-based chat with memory  
 - **Open Chat Mode:** General chat without context  
-- **RAG Mode:** Grounded chat using documents (planned not implemented yet)  
+- **RAG Mode:** Grounded chat using documents (implemented at very basic level)  
 - Persistent conversation history for each user  
 - Conversation titles (auto-generated from first user message)  
 - Supports multiple messages per conversation with proper sequence numbers  
@@ -52,6 +52,9 @@ Email:<amanjainwork1599@gmail.com>
 
 git clone https://github.com/amanman15/bot-gpt-backend.git
 cd bot-gpt-backend
+
+*Note: As of now everything was pushed directly to main branch as no team collaboration is here.*
+
 
 2. **Create virtual environment & install dependencies**
 python -m venv venv
@@ -73,12 +76,13 @@ Visit http://127.0.0.1:8000/docs for swagger.
 **---------------------------------------------------------------------------------**
 ## API Endpoints
 
-1. **Start Conversation**
+1. **Start Conversation with a first message and mode**
 POST /conversations/
 Request Body
 {
   "user_id": 1,
-  "message": "Hello, who is Elon Musk?"
+  "message": "Hello, who is Elon Musk?",
+  "mode": open(default) [open|rag]
 }
 
 Response:
@@ -112,9 +116,9 @@ Response:
   ]
 }
 
-3. **Get Conversation by ID**
+3. **Get Conversation by conversation ID**
 GET /conversations/{conversation_id}
-conversation_id-parameter
+conversation_id---->parameter
 Response
 {
   "conversation_id": 1,
@@ -126,7 +130,7 @@ Response
   ]
 }
 
-4. **List All Conversations for a User**
+4. **List All Conversations for a User(list view)**
 GET /conversations/?user_id={user_id}
 user_id-parameter
 Response
@@ -145,7 +149,7 @@ Response
 
 5. **Delete the conversation**
 DELETE /conversations/{conversation_id}
-conversation_id-paramter
+conversation_id---->paramter
 Response
 {
   "detail": "Conversation 1 deleted successfully"
@@ -157,7 +161,7 @@ Response
 
 1. **User**
 
-id, name, etc.
+id
 
 2. **Conversation**
 
@@ -181,7 +185,7 @@ created_at
 **UNIT TESTING**
 Unit tests are written using pytest and FastAPI TestClient.
 A separate SQLite database is used for test isolation.
-Run tests using: pytest -v
+Run tests using: pytest -v (for verbose mode) and pytest (for direct)
 
 **------------------------------------------------------------------------------**
 
@@ -190,4 +194,4 @@ Run tests using: pytest -v
 Conversations retain full history for a continuous chat experience.
 Sequence numbers ensure proper ordering of messages.
 Titles are auto-generated from the first user message.
-Future enhancements include RAG mode (document-grounded chat)
+Rag mode is implemented at a basic level for understanding the context, can be extended to future ready version.
