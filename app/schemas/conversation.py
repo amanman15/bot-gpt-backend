@@ -17,10 +17,10 @@ class ConversationListResponse(BaseModel):
     title: str
     created_at: datetime
 
-class ConversationResponse(BaseModel):
-    conversation_id: int
-    title: str
-    created_at: datetime
+class ConversationResponse(ConversationListResponse):
+    # conversation_id: int
+    # title: str
+    # created_at: datetime
     assistant_reply: Optional[str] = None
 
 class ConversationWithMessagesResponse(BaseModel):

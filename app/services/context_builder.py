@@ -29,7 +29,12 @@ def build_context(
 ):
     context = []
 
-    system_prompt = "You are a helpful assistant."
+    system_prompt = '''You are a helpful assistant for a conversation chat applicattion
+            Follow these rules:
+            1. Dont hallucinate.
+            2. If you find anything offensive give that in output that this is offensive.
+            3. Use only information available in conversation context.
+    '''
 
     if retrieved_context:
         system_prompt += (
@@ -41,7 +46,7 @@ def build_context(
         "role": "system",
         "content": system_prompt
     })
-
+    print("Total history messages:", len(history_messages))
     # last N messages (sliding window)
     for msg in history_messages[-5:]:
         context.append({
@@ -53,5 +58,8 @@ def build_context(
         "role": "user",
         "content": user_message
     })
+    print("Final context sent to LLM:")
+    for c in context:
+        print(c)
 
     return context
